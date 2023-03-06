@@ -36,8 +36,21 @@ class DinoEngine:
     def ScanObstacles(self):
         self.PastObstacles = []
         while(True):
-            self.Obstacles  = self.Driver.execute_script("return Runner.instance_.horizon.obstacles")
-            if(self.Obstacles!=[] and self.Obstacles!=self.PastObstacles):
-                self.PastObstacles=self.Obstacles
+          
+            self.tRex = self.Driver.execute_script("return Runner.instance_.tRex")
+            self.nxtObstacles  = self.Driver.execute_script("return Runner.instance_.horizon.obstacles.find(o => o.xPos > Runner.instance_.tRex.xPos);")
+            if(self.nxtObstacles!=[] and self.nxtObstacles!=self.PastObstacles):
+                self.PastObstacles=self.nxtObstacles
                 self.Driver.execute_script("console.log(Runner.instance_.horizon.obstacles)")
-                time.sleep(1)
+                self.action()
+    def action(self):
+                   
+
+        	if(self.nxtObstacles and ( self.nxtObstacles['xPos'] - self.tRex['xPos'] ) <= 150 ):
+                    if(self.nxtObstacles["typeConfig"]["type"] == "CACTUS_LARGE" or self.nxtObstacles["typeConfig"]["type"] == "CACTUS_SMALL" or (self.nxtObstacles["typeConfig"]["type"] == "PTERODACTYL" and self.nxtObstacles['yPos']>=75)):
+                        self.Driver.execute_script("Runner.instance_.tRex.startJump(0)")
+                    if(self.nxtObstacles["typeConfig"]["type"] == "PTERODACTYL" and self.nxtObstacles['yPos']<75):
+                        self.Driver.execute_script("Runner.instance_.tRex.setDuck(true)")
+                     
+                        
+	
